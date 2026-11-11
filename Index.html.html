@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="it">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NOLI Food Tracker</title>
+<style>
+:root{--bg:#f5f6f1;--card:#fff;--ink:#20251f;--muted:#737b70;--line:#e5e9df;--green:#527b55;--green2:#e8f0e5;--orange:#d79a42;--blue:#5e83b5;--shadow:0 8px 28px #26351b0b}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.45 -apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+header{padding:26px 18px 18px;background:linear-gradient(135deg,#eaf1e5,#f8f7ef);border-bottom:1px solid var(--line)}
+.wrap{max-width:980px;margin:auto}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}.brand{font-size:12px;letter-spacing:.16em;font-weight:800;color:var(--green)}h1{font-size:29px;margin:7px 0 2px;letter-spacing:-.04em}.sub{color:var(--muted);font-size:13px}
+main{max-width:980px;margin:20px auto;padding:0 14px 50px}.datebar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:16px}.datebar input{max-width:165px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:17px;box-shadow:var(--shadow);margin-bottom:14px}.sectionhead{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}h2{font-size:17px;margin:0}h3{font-size:14px;margin:0 0 8px}
+.kcal{font-size:34px;font-weight:800;letter-spacing:-.04em}.muted{color:var(--muted)}.small{font-size:12px;color:var(--muted)}
+.progress{height:9px;background:#edf0e9;border-radius:20px;overflow:hidden;margin:8px 0}.progress span{display:block;height:100%;border-radius:20px;background:var(--green);width:0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.macro{background:#fafbf8;border:1px solid var(--line);border-radius:13px;padding:12px}.macro strong{display:block;font-size:20px}.macro.protein strong{color:var(--green)}.macro.carbs strong{color:var(--orange)}.macro.fat strong{color:var(--blue)}
+.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}
+button,.btn{border:0;border-radius:11px;padding:10px 13px;background:var(--green);color:white;font-weight:650;cursor:pointer;font-size:13px}
+button.secondary{background:#edf2e9;color:#344b35}button.ghost{background:transparent;color:var(--green);border:1px solid var(--line)}button.danger{background:#f8e9e6;color:#9b4438}
+input,select,textarea{font:inherit;border:1px solid var(--line);border-radius:10px;padding:10px;background:#fff;color:var(--ink);width:100%}
+label{display:block;font-size:12px;color:var(--muted);margin:0 0 5px}.formgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.formgrid .wide{grid-column:1/-1}
+.foodrow{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:11px 0;border-top:1px solid var(--line)}.foodrow:first-child{border-top:0}.foodrow strong{display:block}.foodrow .meta{font-size:12px;color:var(--muted)}
+.pill{display:inline-block;background:var(--green2);color:#456747;border-radius:20px;padding:3px 8px;font-size:11px;font-weight:700}
+.empty{padding:20px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:13px}
+textarea{min-height:100px;resize:vertical}.notice{background:#f7f5e9;border:1px solid #eee6c9;padding:11px;border-radius:12px;font-size:12px;color:#71633d}
+@media(max-width:600px){.grid{gap:7px}.macro{padding:9px}.macro strong{font-size:17px}.card{padding:14px}.kcal{font-size:30px}.formgrid{grid-template-columns:1fr}.formgrid .wide{grid-column:auto}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="top"><div><div class="brand">NOLI · FOOD TRACKER</div><h1>La tua alimentazione, sotto controllo.</h1><div class="sub">Un diario semplice, costruito intorno ai tuoi pasti.</div></div><span class="pill">v2.0</span></div></div></header>
+<main>
+<div class="datebar"><div><strong>Diario giornaliero</strong><div class="small">I dati restano salvati su questo dispositivo.</div></div><input id="day" type="date"></div>
+<section class="card">
+ <div class="sectionhead"><h2>Riepilogo della giornata</h2><span class="pill" id="status">In attesa del primo pasto</span></div>
+ <div class="kcal"><span id="kcal">0</span> <span class="muted" style="font-size:15px;font-weight:500">/ 2.000 kcal</span></div>
+ <div class="progress"><span id="kbar"></span></div><div class="small" id="remaining">2.000 kcal rimanenti</div>
+ <div class="grid" style="margin-top:15px">
+  <div class="macro protein"><span class="small">PROTEINE</span><strong><span id="p">0</span> <small>/ 142 g</small></strong><div class="progress"><span id="pbar"></span></div></div>
+  <div class="macro carbs"><span class="small">CARBOIDRATI</span><strong><span id="c">0</span> <small>/ 234 g</small></strong><div class="progress"><span id="cbar"></span></div></div>
+  <div class="macro fat"><span class="small">GRASSI</span><strong><span id="f">0</span> <small>/ 55 g</small></strong><div class="progress"><span id="fbar"></span></div></div>
+ </div>
+</section>
+<div class="tabs">
+ <button class="secondary" onclick="show('diary')">Diario</button><button class="secondary" onclick="show('quick')">Inserimento rapido</button><button class="secondary" onclick="show('foods')">Alimenti salvati</button><button class="secondary" onclick="show('meals')">Pasti salvati</button><button class="secondary" onclick="show('week')">Settimana</button>
+</div>
+<section id="diary" class="card panel">
+ <div class="sectionhead"><h2>Pasti registrati</h2><button onclick="show('quick')">+ Aggiungi</button></div>
+ <div id="entries"></div>
+</section>
+<section id="quick" class="card panel" hidden>
+ <h2 style="margin-bottom:12px">Inserimento rapido</h2>
+ <div class="notice" style="margin-bottom:12px">Incolla la scheda che ricevi in chat, oppure scegli un alimento già salvato. Puoi incollare più righe separate da una nuova riga nel formato NOLI.</div>
+ <label>Incolla scheda NOLI</label><textarea id="paste" placeholder="ALIMENTO;Nome alimento;quantità_g;kcal;proteine;carboidrati;grassi;sale;fonte"></textarea>
+ <div class="row" style="margin:8px 0 16px"><button onclick="importPaste()">Importa scheda</button><button class="ghost" onclick="document.getElementById('paste').value=''">Pulisci</button></div>
+ <div class="formgrid">
+  <div class="wide"><label>Alimento</label><select id="foodSelect"><option value="">Seleziona un alimento salvato</option></select></div>
+  <div><label>Quantità (g)</label><input id="grams" type="number" min="0" step="1" value="100"></div>
+  <div><label>Tipo di pasto</label><select id="mealType"><option>Colazione</option><option>Spuntino</option><option>Pranzo</option><option selected>Cena</option><option>Altro</option></select></div>
+ </div>
+ <div class="row" style="margin-top:12px"><button onclick="addSelected()">Aggiungi al diario</button></div>
+ <hr style="border:0;border-top:1px solid var(--line);margin:18px 0">
+ <h3>Nuovo alimento</h3>
+ <div class="formgrid">
+  <div class="wide"><label>Nome alimento</label><input id="newName" placeholder="Es. Yogurt greco"></div>
+  <div><label>Quantità di riferimento (g)</label><input id="newBase" type="number" value="100"></div>
+  <div><label>Calorie</label><input id="newK" type="number" step=".1"></div>
+  <div><label>Proteine (g)</label><input id="newP" type="number" step=".1"></div>
+  <div><label>Carboidrati (g)</label><input id="newC" type="number" step=".1"></div>
+  <div><label>Grassi (g)</label><input id="newF" type="number" step=".1"></div>
+  <div><label>Fonte del dato</label><select id="newSource"><option>Etichetta</option><option>Database</option><option>Stima AI</option></select></div>
+ </div>
+ <div class="row" style="margin-top:12px"><button onclick="saveFood()">Salva alimento</button></div>
+</section>
+<section id="foods" class="card panel" hidden><div class="sectionhead"><h2>Archivio alimenti</h2><button onclick="show('quick')">+ Nuovo</button></div><div id="foodList"></div></section>
+<section id="meals" class="card panel" hidden><div class="sectionhead"><h2>Pasti salvati</h2></div><div class="small" style="margin-bottom:10px">Scegli singolarmente gli alimenti del diario da includere nel pasto. Puoi selezionare solo quelli che vuoi.</div><div><label>Filtra per tipo di pasto</label><select id="saveMealType" onchange="renderMealPicker()"><option>Colazione</option><option>Spuntino</option><option>Pranzo</option><option>Cena</option><option>Altro</option></select></div><div id="mealPicker" style="margin:12px 0"></div><div class="row"><button class="secondary" onclick="saveCurrentMeal()">Salva alimenti selezionati</button></div><div id="mealList" style="margin-top:16px"></div></section>
+<section id="week" class="card panel" hidden><h2 style="margin-bottom:12px">Riepilogo ultimi 7 giorni</h2><div id="weekStats"></div><div style="margin-top:14px"><label>Registra peso (kg)</label><div class="row"><input id="weight" type="number" step=".1" placeholder="Es. 72.8"><button onclick="saveWeight()">Salva peso</button></div></div><div id="weightList" style="margin-top:10px"></div></section>
+<section class="card"><div class="sectionhead"><h2>Backup e trasferimento</h2></div><div class="small" style="margin-bottom:10px">Esporta una copia dei tuoi dati per conservarli o trasferirli su un altro dispositivo.</div><div class="row"><button class="secondary" onclick="exportData()">Esporta backup</button><label class="btn ghost" style="cursor:pointer">Importa backup<input type="file" accept="application/json" onchange="restoreData(event)" style="display:none"></label></div></section>
+<div class="small" style="text-align:center;padding:12px">NOLI Food Tracker · Stime e valori nutrizionali sono indicativi. Verifica sempre le etichette.</div>
+</main>
+<script>
+const TARGET={k:2000,p:142,c:234,f:55};
+const tomorrow='2026-11-12';
+let db=JSON.parse(localStorage.getItem('noli_db')||'null')||{
+ foods:[{id:'ortolana',name:'Ortolana cotoletta con spinaci',base:220,k:539,p:24.2,c:44,f:28.6,salt:3.74,source:'Etichetta'}],
+ entries:[],meals:[],weights:[]
+};
+const $=id=>document.getElementById(id);
+function persist(){localStorage.setItem('noli_db',JSON.stringify(db));render()}
+function show(id){document.querySelectorAll('.panel').forEach(x=>x.hidden=true);$(id).hidden=false;if(id==='foods')renderFoods();if(id==='meals'){renderMeals();renderMealPicker();}if(id==='week')renderWeek();if(id==='quick')fillSelect()}
+function fmt(n){return (Math.round((Number(n)||0)*10)/10).toLocaleString('it-IT')}
+function totals(items){return items.reduce((a,x)=>{a.k+=x.k;a.p+=x.p;a.c+=x.c;a.f+=x.f;return a},{k:0,p:0,c:0,f:0})}
+function todayEntries(){return db.entries.filter(x=>x.date===$('day').value)}
+function render(){let t=totals(todayEntries());$('kcal').textContent=fmt(t.k);$('p').textContent=fmt(t.p);$('c').textContent=fmt(t.c);$('f').textContent=fmt(t.f);
+ [['kbar',t.k,TARGET.k],['pbar',t.p,TARGET.p],['cbar',t.c,TARGET.c],['fbar',t.f,TARGET.f]].forEach(([id,v,m])=>$(id).style.width=Math.min(100,v/m*100)+'%');
+ $('remaining').textContent=fmt(Math.max(0,TARGET.k-t.k))+' kcal rimanenti';$('status').textContent=t.k?'Giornata in corso':'In attesa del primo pasto';
+ let es=todayEntries();$('entries').innerHTML=es.length?es.map(x=>`<div class="foodrow"><div><strong>${esc(x.name)}</strong><div class="meta">${esc(x.type)} · ${fmt(x.grams)} g · ${esc(x.source||'Stima')}</div><div class="meta">${fmt(x.p)} P · ${fmt(x.c)} C · ${fmt(x.f)} G</div></div><div style="text-align:right"><strong>${fmt(x.k)} kcal</strong><button class="danger" style="padding:5px 8px;margin-top:5px" onclick="removeEntry('${x.id}')">Rimuovi</button></div></div>`).join(''):'<div class="empty">Nessun alimento registrato per questa giornata. Il diario ti aspetta.</div>';
+}
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function fillSelect(){$('foodSelect').innerHTML='<option value="">Seleziona un alimento salvato</option>'+db.foods.map(x=>`<option value="${x.id}">${esc(x.name)} · ${esc(x.source)}</option>`).join('')}
+function addSelected(){let food=db.foods.find(x=>x.id===$('foodSelect').value),g=Number($('grams').value);if(!food||!g)return alert('Seleziona un alimento e inserisci una quantità.');let r=g/food.base;db.entries.push({id:crypto.randomUUID(),date:$('day').value,name:food.name,grams:g,k:food.k*r,p:food.p*r,c:food.c*r,f:food.f*r,source:food.source,type:$('mealType').value});persist();show('diary')}
+function saveFood(){let name=$('newName').value.trim(),base=Number($('newBase').value),k=Number($('newK').value),p=Number($('newP').value),c=Number($('newC').value),f=Number($('newF').value);if(!name||!base||[k,p,c,f].some(Number.isNaN))return alert('Completa nome, quantità e valori nutrizionali.');db.foods.push({id:crypto.randomUUID(),name,base,k,p,c,f,source:$('newSource').value});['newName','newK','newP','newC','newF'].forEach(id=>$(id).value='');persist();fillSelect();show('foods')}
+function importPaste(){let raw=$('paste').value.trim();if(!raw)return alert('Incolla prima una scheda NOLI.');let lines=raw.split(/\r?\n/),count=0;for(let line of lines){let a=line.split(';').map(s=>s.trim());if(a[0]==='ALIMENTO'&&a.length>=8){let [,name,grams,k,p,c,f,salt,source]=a;grams=Number(grams);k=Number(k);p=Number(p);c=Number(c);f=Number(f);if(name&&grams>0&&[k,p,c,f].every(Number.isFinite)){let food=db.foods.find(x=>x.name.toLowerCase()===name.toLowerCase());if(!food){food={id:crypto.randomUUID(),name,base:grams,k,p,c,f,salt:Number(salt)||0,source:source||'Stima AI'};db.foods.push(food)}db.entries.push({id:crypto.randomUUID(),date:$('day').value,name,grams,k,p,c,f,source:source||'Stima AI',type:$('mealType').value});count++}}}
+ if(!count)return alert('Formato non riconosciuto. Usa: ALIMENTO;Nome;grammi;kcal;proteine;carboidrati;grassi;sale;fonte');$('paste').value='';persist();show('diary');alert(count+' alimento/i importato/i!')}
+function removeEntry(id){db.entries=db.entries.filter(x=>x.id!==id);persist()}
+function renderFoods(){$('foodList').innerHTML=db.foods.map(x=>`<div class="foodrow"><div><strong>${esc(x.name)}</strong><div class="meta">${fmt(x.k)} kcal · ${fmt(x.p)} P · ${fmt(x.c)} C · ${fmt(x.f)} G per ${fmt(x.base)} g</div><span class="pill">${esc(x.source)}</span></div><button class="ghost" onclick="useFood('${x.id}')">Usa</button></div>`).join('')}
+function useFood(id){show('quick');$('foodSelect').value=id;$('grams').value=100}
+function renderMealPicker(){let type=$('saveMealType').value;let es=todayEntries().filter(x=>x.type===type);$('mealPicker').innerHTML=es.length?es.map(x=>`<label class="foodrow" style="display:flex;align-items:center;gap:10px;cursor:pointer"><input type="checkbox" class="meal-choice" value="${x.id}" checked style="width:20px;height:20px;flex:0 0 20px"><span style="flex:1"><strong>${esc(x.name)}</strong><span class="meta" style="display:block">${fmt(x.grams)} g · ${fmt(x.k)} kcal</span></span></label>`).join(''):'<div class="empty">Nessun alimento di questo tipo nella giornata selezionata.</div>'}
+function saveCurrentMeal(){let ids=[...document.querySelectorAll('.meal-choice:checked')].map(x=>x.value);let es=todayEntries().filter(x=>ids.includes(x.id));if(!es.length)return alert('Seleziona almeno un alimento da salvare.');let type=$('saveMealType').value;let name=prompt('Nome del pasto da salvare:',type+' standard');if(!name)return;db.meals.push({id:crypto.randomUUID(),name,items:es.map(x=>({...x,id:undefined}))});persist();renderMeals();renderMealPicker();alert(name+' salvato con '+es.length+' elementi!')}
+function renderMeals(){$('mealList').innerHTML=db.meals.length?db.meals.map(m=>`<div class="foodrow"><div><strong>${esc(m.name)}</strong><div class="meta">${m.items.length} elementi</div></div><button onclick="useMeal('${m.id}')">Aggiungi oggi</button></div>`).join(''):'<div class="empty">Ancora nessun pasto salvato. Puoi salvare una combinazione dal diario.</div>'}
+function useMeal(id){let m=db.meals.find(x=>x.id===id);m.items.forEach(x=>db.entries.push({...x,id:crypto.randomUUID(),date:$('day').value}));persist();show('diary')}
+function renderWeek(){let dates=[];for(let i=6;i>=0;i--){let d=new Date($('day').value+'T12:00:00');d.setDate(d.getDate()-i);dates.push(d.toISOString().slice(0,10))}let days=dates.map(date=>({date,t:totals(db.entries.filter(x=>x.date===date))}));let active=days.filter(x=>x.t.k>0),avg=active.length?totals(active.map(x=>x.t)):null;$('weekStats').innerHTML=active.length?`<div class="grid"><div class="macro"><span class="small">MEDIA KCAL</span><strong>${fmt(avg.k/active.length)}</strong></div><div class="macro"><span class="small">MEDIA PROTEINE</span><strong>${fmt(avg.p/active.length)} g</strong></div><div class="macro"><span class="small">GIORNI REGISTRATI</span><strong>${active.length}/7</strong></div></div><div style="margin-top:12px">${days.map(x=>`<div class="foodrow"><span>${x.date}</span><strong>${x.t.k?fmt(x.t.k)+' kcal':'-'}</strong></div>`).join('')}</div>`:'<div class="empty">La media settimanale apparirà dopo i primi pasti registrati.</div>';$('weightList').innerHTML=db.weights.slice(-8).reverse().map(x=>`<div class="foodrow"><span>${x.date}</span><strong>${fmt(x.kg)} kg</strong></div>`).join('')}
+function saveWeight(){let kg=Number($('weight').value);if(!kg)return alert('Inserisci un peso valido.');db.weights.push({date:$('day').value,kg});$('weight').value='';persist();renderWeek()}
+function exportData(){let blob=new Blob([JSON.stringify(db,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='noli-backup.json';a.click();URL.revokeObjectURL(a.href)}
+function restoreData(e){let f=e.target.files[0];if(!f)return;let r=new FileReader();r.onload=()=>{try{let x=JSON.parse(r.result);if(!x.foods||!x.entries)throw 0;db=x;persist();alert('Backup importato.')}catch{alert('File di backup non valido.')}};r.readAsText(f)}
+$('day').value=tomorrow;$('day').addEventListener('change',render);fillSelect();render();
+</script>
+</body></html>
